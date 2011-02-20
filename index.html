@@ -1,9 +1,26 @@
 <!doctype html>
 <html>
   <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
     <script src="brainfuck.js"></script>
   </head>
   <body>
-    See console for output
+    <form>
+      <p>
+      <label for='code'>Brainfuck code</label>
+      <input name='code' id='code'></input>
+      </p>
+
+      <p>
+      <label for='input'>Input</label>
+      <input name='input' id='input'></input>
+      </p>
+
+      <p>
+      <input type='submit' />
+      </p>
+    </form>
+
+    <p id='output'></p>
   </body>
 </html>

@@ -7,7 +7,7 @@ function assert(condition, message) {
 var BF = (function () {
   var that = {};
 
-  function init(code, input) {
+  function parse(code, input) {
     that.code = code.split('');
     if (input) {
       that.input = input.split('');
@@ -22,6 +22,8 @@ var BF = (function () {
     that.i_ptr = -1;
     that.d_ptr = 0;
     that.curr = '';
+    that.iteration = 0;
+    that.max_iterations = 10000;
 
     checkSyntax();
 
@@ -29,10 +31,13 @@ var BF = (function () {
       executeCurrentInstruction();
     }
 
-    console.log(that.output.join(''));
+    return that.output.join('');
   }
 
   function getNextInstruction(backwards) {
+    that.iteration++;
+    assert(that.iteration < that.max_iterations, "Maximum iteration limit hit");
+
     if (backwards) {
       that.i_ptr--;
     }
@@ -159,9 +164,28 @@ var BF = (function () {
     assert(counter === 0, 'Mismatched brackets');
   }
 
-  that.init = init;
+  that.parse = parse;
   return that;
 })();
 
-BF.init('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
-BF.init(',[.-]', 'Z');
+
+$(document).ready(function () {
+  $('form').submit(function (e) {
+    e.preventDefault();
+    var code = $('#code').val();
+    var input = $('#input').val();
+    var output = '';
+    try {
+      output = BF.parse(code, input);
+    }
+    catch (e) {
+      output = e;
+    }
+    $('#output').html(output);
+  });
+});
+
+var output = BF.parse('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
+console.log(output);
+output = BF.parse(',[.-]', 'Z');
+console.log(output);
