@@ -163,6 +163,9 @@ button {  width: auto; overflow: visible; }
 
 
 
+body {
+  font-size: 120%;
+}
 
 td p {
   line-height: 20px;
@@ -173,7 +176,7 @@ td {
 }
 
 #output {
-  width: 300px;
+  width: 400px;
   height: 200px;
   padding: 5px;
   border: 1px solid gray;
