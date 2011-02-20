@@ -165,6 +165,7 @@ button {  width: auto; overflow: visible; }
 
 body {
   font-size: 120%;
+  margin: 2em;
 }
 
 td p {
