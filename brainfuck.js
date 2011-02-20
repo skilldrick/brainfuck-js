@@ -114,7 +114,14 @@ var BF = (function () {
   }
 
   function readInput() {
-    that.data[that.d_ptr] = that.input.shift().charCodeAt(0);
+    var c = that.input.shift();
+    if (c && c.charCodeAt) {
+      that.data[that.d_ptr] = c.charCodeAt(0);
+    }
+    else {
+      //if no input just insert 0
+      that.data[that.d_ptr] = 0;
+    }
   }
 
   function writeOutput() {
