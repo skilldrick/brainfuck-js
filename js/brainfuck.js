@@ -170,6 +170,17 @@ var BF = (function () {
 
 
 $(document).ready(function () {
+  var queryString = window.location.search.substring(1);
+  var paramsArray = queryString.split('&');
+  var params = {};
+  for (var i = 0; i < paramsArray.length; i++) {
+    var param = paramsArray[i].split('=');
+    params[param[0]] = decodeURI(param[1]);
+  }
+
+  $('#code').val(params.code);
+  $('#input').val(params.input);
+
   $('form').submit(function (e) {
     e.preventDefault();
     var code = $('#code').val();
@@ -185,7 +196,9 @@ $(document).ready(function () {
   });
 });
 
+/*
 var output = BF.parse('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
 console.log(output);
 output = BF.parse(',[.-]', 'Z');
 console.log(output);
+*/
