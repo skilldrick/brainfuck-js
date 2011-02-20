@@ -164,9 +164,21 @@ button {  width: auto; overflow: visible; }
 
 
 
+td p {
+  line-height: 20px;
+}
 
+td {
+  padding: 5px;
+}
 
-
+#output {
+  width: 300px;
+  height: 200px;
+  padding: 5px;
+  border: 1px solid gray;
+  margin-top: 1em;
+}
 
 
 
