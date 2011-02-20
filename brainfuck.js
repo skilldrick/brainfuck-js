@@ -1,30 +1,50 @@
-var BF = function (code, input) {
-  var code = code.split('');
-  if (input) {
-    var input = input.split('');
+function assert(condition, message) {
+  if (! condition) {
+    throw message;
   }
-  var data = [];
-  for (var i = 0; i < 1000; i++) {
-    data[i] = 0;
+}
+
+var BF = (function () {
+  var that = {};
+
+  function init(code, input) {
+    that.code = code.split('');
+    if (input) {
+      that.input = input.split('');
+    }
+    that.data = [];
+    for (var i = 0; i < 10000; i++) {
+      that.data[i] = 0;
+    }
+    that.max_d = that.data.length;
+    that.max_i = that.code.length;
+    that.output = [];
+    that.i_ptr = -1;
+    that.d_ptr = 0;
+    that.curr = '';
+
+    checkSyntax();
+
+    while (getNextInstruction()) {
+      executeCurrentInstruction();
+    }
+
+    console.log(that.output.join(''));
   }
-  var output = [];
-  var i_ptr = -1;
-  var d_ptr = 0;
-  var curr = '';
 
   function getNextInstruction(backwards) {
     if (backwards) {
-      i_ptr--;
+      that.i_ptr--;
     }
     else {
-      i_ptr++;
+      that.i_ptr++;
     }
-    curr = code[i_ptr];
-    return curr;
+    that.curr = that.code[that.i_ptr];
+    return that.curr;
   }
 
   function executeCurrentInstruction() {
-    switch (curr) {
+    switch (that.curr) {
     case ',':
       readInput();
       break;
@@ -53,17 +73,17 @@ var BF = function (code, input) {
   }
 
   function openLoop() {
-    if (data[d_ptr]) {
+    if (that.data[that.d_ptr]) {
       return;
     }
 
     var counter = 0;
     while (true) {
       getNextInstruction();
-      if (curr === '[') {
+      if (that.curr === '[') {
         counter++;
       }
-      else if (c === ']') {
+      else if (that.curr === ']') {
         counter--;
         if (counter === 0) {
           break;
@@ -73,17 +93,18 @@ var BF = function (code, input) {
   }
 
   function closeLoop() {
-    if (data[d_ptr] === 0) {
+    if (that.data[that.d_ptr] === 0) {
       return;
     }
 
     var counter = 1;
     while (true) {
       getNextInstruction(true);
-      if (curr === ']') {
+      assert(that.i_ptr >= 0, "Mismatched brackets");
+      if (that.curr === ']') {
         counter++;
       }
-      else if (curr === '[') {
+      else if (that.curr === '[') {
         counter--;
         if (counter === 0) {
           break;
@@ -93,34 +114,47 @@ var BF = function (code, input) {
   }
 
   function readInput() {
-    data[d_ptr] = input.shift().charCodeAt(0);
+    that.data[that.d_ptr] = that.input.shift().charCodeAt(0);
   }
 
   function writeOutput() {
-    output.push(String.fromCharCode(data[d_ptr]));
+    that.output.push(String.fromCharCode(that.data[that.d_ptr]));
   }
 
   function incData() {
-    data[d_ptr]++;
+    that.data[that.d_ptr]++;
   }
 
   function decData() {
-    data[d_ptr]--;
+    that.data[that.d_ptr]--;
   }
 
   function incPointer() {
-    d_ptr++;
+    that.d_ptr++;
   }
 
   function decPointer() {
-    d_ptr--;
+    that.d_ptr--;
   }
 
-  while (getNextInstruction()) {
-    executeCurrentInstruction();
+  function checkSyntax() {
+    var counter = 0;
+    var c = '';
+    for (var i = 0; i < that.max_i; i++) {
+      c = that.code[i];
+      if (c === '[') {
+        counter++;
+      }
+      else if (c === ']') {
+        counter--;
+      }
+    }
+    assert(counter === 0, 'Mismatched brackets');
   }
 
-  console.log(output.join(''));
-}
+  that.init = init;
+  return that;
+})();
 
-BF('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.', '');
+BF.init('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
+BF.init(',[.-]', 'Z');
