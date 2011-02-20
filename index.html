@@ -1,19 +1,18 @@
 <!doctype html>
 <html>
   <head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
-    <script src="brainfuck.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <form>
       <p>
       <label for='code'>Brainfuck code</label>
-      <input name='code' id='code'></input>
+      <input name='code' id='code' value=',[.-]'></input>
       </p>
 
       <p>
       <label for='input'>Input</label>
-      <input name='input' id='input'></input>
+      <input name='input' id='input' value='z'></input>
       </p>
 
       <p>
@@ -22,5 +21,17 @@
     </form>
 
     <p id='output'></p>
+
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+    <script src="js/brainfuck.js"></script>
+    <!-- mathiasbynens.be/notes/async-analytics-snippet Change UA-XXXXX-X to be your site's ID -->
+    <script>
+      var _gaq=[['_setAccount','UA-3174668-9'],['_trackPageview']];
+      (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
+
   </body>
 </html>
