@@ -186,13 +186,15 @@ $(document).ready(function () {
     var code = $('#code').val();
     var input = $('#input').val();
     var output = '';
+    var escaped = '';
     try {
       output = BF.parse(code, input);
     }
     catch (e) {
       output = e;
     }
-    $('#output').html(output);
+    escaped = output.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    $('#output').html(escaped);
   });
 });
 
