@@ -170,6 +170,15 @@ var BF = (function () {
 
 
 $(document).ready(function () {
+  function makeUrl() {
+    var code = $('#code').val() || '';
+    var input = $('#input').val() || '';
+    var url = 'http://skilldrick.co.uk/brainfuck/';
+    url += '?code=' + code;
+    url += '&input=' + encodeURIComponent(input);
+    $('#url').attr('href', url);
+  }
+
   var queryString = window.location.search.substring(1);
   var paramsArray = queryString.split('&');
   var params = {};
@@ -180,6 +189,12 @@ $(document).ready(function () {
 
   $('#code').val(params.code);
   $('#input').val(params.input);
+  makeUrl();
+
+
+  $('#code, #input').change(function () {
+    makeUrl();
+  });
 
   $('form').submit(function (e) {
     e.preventDefault();
