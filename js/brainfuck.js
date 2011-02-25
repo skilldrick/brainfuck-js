@@ -1,29 +1,29 @@
-function assert(condition, message) {
-  if (! condition) {
-    throw message;
-  }
-}
-
 var BF = (function () {
-  var that = {};
+  var bf = {};
+
+  function assert(condition, message) {
+    if (! condition) {
+      throw message;
+    }
+  }
 
   function parse(code, input) {
-    that.code = code.split('');
+    bf.code = code.split('');
     if (input) {
-      that.input = input.split('');
+      bf.input = input.split('');
     }
-    that.data = [];
-    for (var i = 0; i < 10000; i++) {
-      that.data[i] = 0;
+    bf.data = [];
+    for (var i = 0; i < 40000; i++) {
+      bf.data[i] = 0;
     }
-    that.max_d = that.data.length;
-    that.max_i = that.code.length;
-    that.output = [];
-    that.i_ptr = -1;
-    that.d_ptr = 0;
-    that.curr = '';
-    that.iteration = 0;
-    that.max_iterations = 10000;
+    bf.max_d = bf.data.length;
+    bf.max_i = bf.code.length;
+    bf.output = [];
+    bf.i_ptr = -1;
+    bf.d_ptr = 0;
+    bf.curr = '';
+    bf.iteration = 0;
+    bf.max_iterations = 100000;
 
     checkSyntax();
 
@@ -31,25 +31,25 @@ var BF = (function () {
       executeCurrentInstruction();
     }
 
-    return that.output.join('');
+    return bf.output.join('');
   }
 
   function getNextInstruction(backwards) {
-    that.iteration++;
-    assert(that.iteration < that.max_iterations, "Maximum iteration limit hit");
+    bf.iteration++;
+    assert(bf.iteration < bf.max_iterations, "Maximum iteration limit hit");
 
     if (backwards) {
-      that.i_ptr--;
+      bf.i_ptr--;
     }
     else {
-      that.i_ptr++;
+      bf.i_ptr++;
     }
-    that.curr = that.code[that.i_ptr];
-    return that.curr;
+    bf.curr = bf.code[bf.i_ptr];
+    return bf.curr;
   }
 
   function executeCurrentInstruction() {
-    switch (that.curr) {
+    switch (bf.curr) {
     case ',':
       readInput();
       break;
@@ -78,17 +78,17 @@ var BF = (function () {
   }
 
   function openLoop() {
-    if (that.data[that.d_ptr]) {
+    if (bf.data[bf.d_ptr]) {
       return;
     }
 
     var counter = 0;
     while (true) {
       getNextInstruction();
-      if (that.curr === '[') {
+      if (bf.curr === '[') {
         counter++;
       }
-      else if (that.curr === ']') {
+      else if (bf.curr === ']') {
         counter--;
         if (counter === 0) {
           break;
@@ -98,18 +98,18 @@ var BF = (function () {
   }
 
   function closeLoop() {
-    if (that.data[that.d_ptr] === 0) {
+    if (bf.data[bf.d_ptr] === 0) {
       return;
     }
 
     var counter = 1;
     while (true) {
       getNextInstruction(true);
-      assert(that.i_ptr >= 0, "Mismatched brackets");
-      if (that.curr === ']') {
+      assert(bf.i_ptr >= 0, "Mismatched brackets");
+      if (bf.curr === ']') {
         counter++;
       }
-      else if (that.curr === '[') {
+      else if (bf.curr === '[') {
         counter--;
         if (counter === 0) {
           break;
@@ -119,41 +119,40 @@ var BF = (function () {
   }
 
   function readInput() {
-    var c = that.input.shift();
+    var c = bf.input.shift();
     if (c && c.charCodeAt) {
-      that.data[that.d_ptr] = c.charCodeAt(0);
+      bf.data[bf.d_ptr] = c.charCodeAt(0);
     }
     else {
-      //if no input just insert 0
-      that.data[that.d_ptr] = 0;
+      //if no input leave cell unchanged
     }
   }
 
   function writeOutput() {
-    that.output.push(String.fromCharCode(that.data[that.d_ptr]));
+    bf.output.push(String.fromCharCode(bf.data[bf.d_ptr]));
   }
 
   function incData() {
-    that.data[that.d_ptr]++;
+    bf.data[bf.d_ptr]++;
   }
 
   function decData() {
-    that.data[that.d_ptr]--;
+    bf.data[bf.d_ptr]--;
   }
 
   function incPointer() {
-    that.d_ptr++;
+    bf.d_ptr++;
   }
 
   function decPointer() {
-    that.d_ptr--;
+    bf.d_ptr--;
   }
 
   function checkSyntax() {
     var counter = 0;
     var c = '';
-    for (var i = 0; i < that.max_i; i++) {
-      c = that.code[i];
+    for (var i = 0; i < bf.max_i; i++) {
+      c = bf.code[i];
       if (c === '[') {
         counter++;
       }
@@ -164,8 +163,8 @@ var BF = (function () {
     assert(counter === 0, 'Mismatched brackets');
   }
 
-  that.parse = parse;
-  return that;
+  bf.parse = parse;
+  return bf;
 })();
 
 
