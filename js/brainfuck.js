@@ -1,5 +1,15 @@
-var BF = (function () {
-  var bf = {};
+var parse = (function () {
+  var MAX_ITERATIONS = 100000;
+
+  var code;
+  var data;
+  var input;
+  var output;
+  var max_i;
+  var i_ptr;
+  var d_ptr;
+  var curr;
+  var iteration;
 
   function assert(condition, message) {
     if (! condition) {
@@ -7,23 +17,21 @@ var BF = (function () {
     }
   }
 
-  function parse(code, input) {
-    bf.code = code.split('');
-    if (input) {
-      bf.input = input.split('');
+  function parse(codeString, inputString) {
+    code = codeString.split('');
+    if (inputString) {
+      input = inputString.split('');
     }
-    bf.data = [];
+    data = [];
     for (var i = 0; i < 40000; i++) {
-      bf.data[i] = 0;
+      data[i] = 0;
     }
-    bf.max_d = bf.data.length;
-    bf.max_i = bf.code.length;
-    bf.output = [];
-    bf.i_ptr = -1;
-    bf.d_ptr = 0;
-    bf.curr = '';
-    bf.iteration = 0;
-    bf.max_iterations = 100000;
+    max_i = code.length;
+    output = [];
+    i_ptr = -1;
+    d_ptr = 0;
+    curr = '';
+    iteration = 0;
 
     checkSyntax();
 
@@ -31,25 +39,25 @@ var BF = (function () {
       executeCurrentInstruction();
     }
 
-    return bf.output.join('');
+    return output.join('');
   }
 
   function getNextInstruction(backwards) {
-    bf.iteration++;
-    assert(bf.iteration < bf.max_iterations, "Maximum iteration limit hit");
+    iteration++;
+    assert(iteration < MAX_ITERATIONS, "Maximum iteration limit hit");
 
     if (backwards) {
-      bf.i_ptr--;
+      i_ptr--;
     }
     else {
-      bf.i_ptr++;
+      i_ptr++;
     }
-    bf.curr = bf.code[bf.i_ptr];
-    return bf.curr;
+    curr = code[i_ptr];
+    return curr;
   }
 
   function executeCurrentInstruction() {
-    switch (bf.curr) {
+    switch (curr) {
     case ',':
       readInput();
       break;
@@ -78,17 +86,17 @@ var BF = (function () {
   }
 
   function openLoop() {
-    if (bf.data[bf.d_ptr]) {
+    if (data[d_ptr]) {
       return;
     }
 
     var counter = 0;
     while (true) {
       getNextInstruction();
-      if (bf.curr === '[') {
+      if (curr === '[') {
         counter++;
       }
-      else if (bf.curr === ']') {
+      else if (curr === ']') {
         counter--;
         if (counter === 0) {
           break;
@@ -98,18 +106,18 @@ var BF = (function () {
   }
 
   function closeLoop() {
-    if (bf.data[bf.d_ptr] === 0) {
+    if (data[d_ptr] === 0) {
       return;
     }
 
     var counter = 1;
     while (true) {
       getNextInstruction(true);
-      assert(bf.i_ptr >= 0, "Mismatched brackets");
-      if (bf.curr === ']') {
+      assert(i_ptr >= 0, "Mismatched brackets");
+      if (curr === ']') {
         counter++;
       }
-      else if (bf.curr === '[') {
+      else if (curr === '[') {
         counter--;
         if (counter === 0) {
           break;
@@ -119,9 +127,9 @@ var BF = (function () {
   }
 
   function readInput() {
-    var c = bf.input.shift();
+    var c = input.shift();
     if (c && c.charCodeAt) {
-      bf.data[bf.d_ptr] = c.charCodeAt(0);
+      data[d_ptr] = c.charCodeAt(0);
     }
     else {
       //if no input leave cell unchanged
@@ -129,30 +137,30 @@ var BF = (function () {
   }
 
   function writeOutput() {
-    bf.output.push(String.fromCharCode(bf.data[bf.d_ptr]));
+    output.push(String.fromCharCode(data[d_ptr]));
   }
 
   function incData() {
-    bf.data[bf.d_ptr]++;
+    data[d_ptr]++;
   }
 
   function decData() {
-    bf.data[bf.d_ptr]--;
+    data[d_ptr]--;
   }
 
   function incPointer() {
-    bf.d_ptr++;
+    d_ptr++;
   }
 
   function decPointer() {
-    bf.d_ptr--;
+    d_ptr--;
   }
 
   function checkSyntax() {
     var counter = 0;
     var c = '';
-    for (var i = 0; i < bf.max_i; i++) {
-      c = bf.code[i];
+    for (var i = 0; i < max_i; i++) {
+      c = code[i];
       if (c === '[') {
         counter++;
       }
@@ -163,8 +171,7 @@ var BF = (function () {
     assert(counter === 0, 'Mismatched brackets');
   }
 
-  bf.parse = parse;
-  return bf;
+  return parse;
 })();
 
 
@@ -202,19 +209,17 @@ $(document).ready(function () {
     var output = '';
     var escaped = '';
     try {
-      output = BF.parse(code, input);
+      output = parse(code, input);
     }
     catch (e) {
       output = e;
     }
-    escaped = output.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    $('#output').html(escaped);
+    //escaped = output.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    $('#output').text(output);
   });
 });
 
-/*
-var output = BF.parse('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
+var output = parse('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
 console.log(output);
-output = BF.parse(',[.-]', 'Z');
+output = parse(',[.-]', 'Z');
 console.log(output);
-*/
