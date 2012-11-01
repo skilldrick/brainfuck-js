@@ -74,15 +74,14 @@ var parse = (function () {
 
 
 
-  var OP_REGEX = /<|>|\+|-|\.|,/;
-  var chars;
+  var programChars;
 
   function parseProgram() {
     var nodes = [];
     var nextChar;
 
-    while (chars.length > 0) {
-      nextChar = chars.shift();
+    while (programChars.length > 0) {
+      nextChar = programChars.shift();
       if (ops[nextChar]) {
         nodes.push(ops[nextChar]);
       } else if (nextChar == '[') {
@@ -101,8 +100,8 @@ var parse = (function () {
     var nodes = [];
     var nextChar;
 
-    while (chars[0] != ']') {
-      nextChar = chars.shift();
+    while (programChars[0] != ']') {
+      nextChar = programChars.shift();
       if (nextChar == undefined) {
         throw "Missing closing bracket";
       } else if (ops[nextChar]) {
@@ -113,13 +112,13 @@ var parse = (function () {
         throw "Invalid character: " + nextChar;
       }
     }
-    chars.shift(); //discard ']'
+    programChars.shift(); //discard ']'
 
     return loop(nodes);
   }
 
   function parse(str) {
-    chars = str.split('');
+    programChars = str.split('');
     return parseProgram();
   }
 
