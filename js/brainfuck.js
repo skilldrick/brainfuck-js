@@ -109,7 +109,7 @@ var parse = (function () {
       } else if (nextChar == '[') {
         nodes.push(parseLoop());
       } else {
-        throw "Invalid character: " + nextChar;
+        // ignore it
       }
     }
     programChars.shift(); //discard ']'
