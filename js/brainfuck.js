@@ -1,47 +1,80 @@
 var parse = (function () {
-
-  var OP_REGEX = /<|>|\+|-|\.|,/;
-  var chars;
+  var data;
+  var ptr;
+  var debug = false;
 
   var ops = {
     '+': function (output) {
-      console.log('+');
+      data[ptr] = data[ptr] || 0;
+      data[ptr]++;
+      debug && console.log('+', data[ptr], ptr);
     },
+
     '-': function (output) {
-      console.log('-');
+      data[ptr] = data[ptr] || 0;
+      data[ptr]--;
+      debug && console.log('-', data[ptr], ptr);
     },
+
     '<': function (output) {
-      console.log('<');
+      ptr--;
+      if (ptr < 0) {
+        ptr = 0; //Don't allow pointer to leave data array
+      }
+      debug && console.log('<', ptr);
     },
+
     '>': function (output) {
-      console.log('>');
+      ptr++;
+      debug && console.log('>', ptr);
     },
+
     '.': function (output) {
-      console.log('.');
+      var c = String.fromCharCode(data[ptr]);
+      output.push(c);
+      debug && console.log('.', c, data[ptr]);
     },
-    ',': function (output) {
-      console.log(',');
+
+    ',': function (output, input) {
+      var c = input.shift();
+      if (typeof c == "string") {
+        data[ptr] = c.charCodeAt(0);
+      }
+      debug && console.log(',', c, data[ptr]);
     },
   };
 
   function program(nodes) {
     return function (input) {
       var output = [];
+      data = [];
+      ptr = 0;
+
+      input = input && input.split('') || [];
+
       nodes.forEach(function (node) {
-        node(output);
+        node(output, input);
       });
 
-      return output;
+      return output.join('');
     }
   }
 
   function loop(nodes) {
-    return function (output) {
-      nodes.forEach(function (node) {
-        node(output);
-      });
+    return function (output, input) {
+      while(data[ptr] > 0) {
+        nodes.forEach(function (node) {
+          node(output, input);
+        });
+      }
     };
   }
+
+
+
+
+  var OP_REGEX = /<|>|\+|-|\.|,/;
+  var chars;
 
   function parseProgram() {
     var nodes = [];
@@ -131,7 +164,7 @@ $(document).ready(function () {
     var input = $('#input').val();
     var output;
     try {
-      output = parse(code, input);
+      output = run(code, input);
     }
     catch (e) {
       output = e;
@@ -139,8 +172,8 @@ $(document).ready(function () {
     $('#output').text(output);
   });
 });
-var output = run('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
-//console.log(output);
-output = run(',[.-]', 'Z');
-//console.log(output);
 
+var output = run('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
+console.log(output);
+output = run(',[.-]', 'Z');
+console.log(output);
