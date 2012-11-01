@@ -3,48 +3,100 @@ var parse = (function () {
   var OP_REGEX = /<|>|\+|-|\.|,/;
   var chars;
 
-  function program() {
-    var prog = [];
+  var ops = {
+    '+': function (output) {
+      console.log('+');
+    },
+    '-': function (output) {
+      console.log('-');
+    },
+    '<': function (output) {
+      console.log('<');
+    },
+    '>': function (output) {
+      console.log('>');
+    },
+    '.': function (output) {
+      console.log('.');
+    },
+    ',': function (output) {
+      console.log(',');
+    },
+  };
+
+  function program(nodes) {
+    return function (input) {
+      var output = [];
+      nodes.forEach(function (node) {
+        node(output);
+      });
+
+      return output;
+    }
+  }
+
+  function loop(nodes) {
+    return function (output) {
+      nodes.forEach(function (node) {
+        node(output);
+      });
+    };
+  }
+
+  function parseProgram() {
+    var nodes = [];
+    var nextChar;
 
     while (chars.length > 0) {
-      if (chars[0].match(OP_REGEX)) {
-        prog.push(chars.shift());
-      } else if (chars[0] == '[') {
-        prog.push(loop());
-      } else if (chars[0] == ']') {
+      nextChar = chars.shift();
+      if (ops[nextChar]) {
+        nodes.push(ops[nextChar]);
+      } else if (nextChar == '[') {
+        nodes.push(parseLoop());
+      } else if (nextChar == ']') {
         throw "Missing opening bracket";
+      } else {
+        // ignore it
       }
     }
 
-    return prog;
+    return program(nodes);
   }
 
-  function loop() {
-    var lp = [];
-    chars.shift(); //discard '['
+  function parseLoop() {
+    var nodes = [];
+    var nextChar;
+
     while (chars[0] != ']') {
-      if (chars[0] == undefined) {
+      nextChar = chars.shift();
+      if (nextChar == undefined) {
         throw "Missing closing bracket";
-      }
-      else if (chars[0].match(OP_REGEX)) {
-        lp.push(chars.shift());
-      } else if (chars[0] == '[') {
-        lp.push(loop());
+      } else if (ops[nextChar]) {
+        nodes.push(ops[nextChar]);
+      } else if (nextChar == '[') {
+        nodes.push(parseLoop());
       } else {
-        throw "Invalid character: " + chars[0];
+        throw "Invalid character: " + nextChar;
       }
     }
     chars.shift(); //discard ']'
-    return lp;
+
+    return loop(nodes);
   }
 
   function parse(str) {
     chars = str.split('');
-    return program();
+    return parseProgram();
   }
 
   return parse;
 })();
+
+
+function run(code, input) {
+  return parse(code)(input);
+}
+
 
 $(document).ready(function () {
   function makeUrl() {
@@ -87,7 +139,8 @@ $(document).ready(function () {
     $('#output').text(output);
   });
 });
-var output = parse('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
-console.log(output);
-output = parse(',[.-]', 'Z');
-console.log(output);
+var output = run('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
+//console.log(output);
+output = run(',[.-]', 'Z');
+//console.log(output);
+
