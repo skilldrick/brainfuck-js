@@ -1,3 +1,51 @@
+var parse = (function () {
+
+  var OP_REGEX = /<|>|\+|-|\.|,/;
+  var chars;
+
+  function program() {
+    var prog = [];
+
+    while (chars.length > 0) {
+      if (chars[0].match(OP_REGEX)) {
+        prog.push(chars.shift());
+      } else if (chars[0] == '[') {
+        prog.push(loop());
+      } else if (chars[0] == ']') {
+        throw "Missing opening bracket";
+      }
+    }
+
+    return prog;
+  }
+
+  function loop() {
+    var lp = [];
+    chars.shift(); //discard '['
+    while (chars[0] != ']') {
+      if (chars[0] == undefined) {
+        throw "Missing closing bracket";
+      }
+      else if (chars[0].match(OP_REGEX)) {
+        lp.push(chars.shift());
+      } else if (chars[0] == '[') {
+        lp.push(loop());
+      } else {
+        throw "Invalid character: " + chars[0];
+      }
+    }
+    chars.shift(); //discard ']'
+    return lp;
+  }
+
+  function parse(str) {
+    chars = str.split('');
+    return program();
+  }
+
+  return parse;
+})();
+
 $(document).ready(function () {
   function makeUrl() {
     var code = $('#code').val() || '';
@@ -39,3 +87,7 @@ $(document).ready(function () {
     $('#output').text(output);
   });
 });
+var output = parse('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.');
+console.log(output);
+output = parse(',[.-]', 'Z');
+console.log(output);
