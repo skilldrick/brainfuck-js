@@ -64,7 +64,11 @@ var parse = (function () {
 
   function loop(nodes) {
     return function () {
+      var loopCounter = 0;
+
       while(data[ptr] > 0) {
+        if (loopCounter++ > 10000) { throw "Infinite loop detected"; }
+
         nodes.forEach(function (node) {
           node();
         });
